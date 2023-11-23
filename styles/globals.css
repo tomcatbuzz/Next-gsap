@@ -353,3 +353,12 @@ nav li a:hover {
   text-align: center;
   line-height: 100px;
 }
+
+.transitioning {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  background-color: #aaa;
+  perspective: 1800px;
+}
