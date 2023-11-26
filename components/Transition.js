@@ -5,6 +5,7 @@ import gsap from 'gsap/dist/gsap';
 import styled from "styled-components"
 
 import TransitionContext from '../context/TransitionContext';
+import { useIsomorphicLayoutEffect } from '../helpers/isomorphicEffect';
 
 const MainComponent = styled.div`
 ${'' /* transform-style: preserve-3d; */}
@@ -15,6 +16,9 @@ ${'' /* transform-style: preserve-3d; */}
   width: 100%;
   opacity: 0;
   z-index: 4;
+  ${'' /* testing below hack */}
+  ${'' /* max-height: 100%;
+  overflow-y: auto; */}
 
   ${'' /* flip animation */}
   ${'' /* animation: 500ms ${transitionInFlip} 250ms cubic-bezier(0.37, 0, 0.63, 1) both; */}
@@ -22,15 +26,15 @@ ${'' /* transform-style: preserve-3d; */}
 }
 
 ${'' /* flip animation */}
-&.page-enter-active,
+${'' /* &.page-enter-active,
 &.page-exit-active {
   .page-transition-inner {
     height: 100vh;
     overflow: hidden;
-    ${'' /* animation: 1000ms ${transitionZoom} cubic-bezier(0.45, 0, 0.55, 1) both; */}
+    animation: 1000ms ${transitionZoom} cubic-bezier(0.45, 0, 0.55, 1) both;
     background: white;
   }
-}
+} */}
 
 ${'' /* &.page-exit {
   ~ .wipe {
@@ -61,6 +65,10 @@ ${'' /* &.page-enter-done {
 } */}
 `
 
+// const SecondaryComponent = styled.div`
+// position: relative;
+// `
+
 const Grid = styled.div`
 width: 100%;
 height: 100vh;
@@ -73,7 +81,7 @@ grid-template-columns: repeat(10, 1fr);
 
   div {
     background: #444;
-    visibility: hidden;
+    ${'' /* visibility: hidden; */}
   }
 `
 
@@ -92,41 +100,84 @@ const TransitionComponent = ({ children, route, routingPageOffset }) => {
   const stopTransition = () => {
     toggleCompleted(true)
     setTransitioning('')
+    console.log(stopTransition, "complete?")
+    console.log(setTransitioning, "done?")
   }
 
   // gsap animation
-  useEffect(() => {
+  // useEffect(() => {
+  //   if (!transitionRef.current) {
+  //     return
+  //   }
+  //     const squares = transitionRef.current.children
+  //     gsap.set(squares, {
+  //       autoAlpha: 1
+  //     })
+  //     tl.current = gsap.timeline({
+  //       repeat: 1,
+  //       repeatDelay: 0.2,
+  //       yoyo: true,
+  //       paused: true
+  //     })
+  //     .fromTo(squares, 
+  //       {
+  //         scale: 0,
+  //         borderRadius: '100'
+  //       },
+  //       {
+  //         scale: 1,
+  //         borderRadius: 0,
+  //         stagger: {
+  //           grid: 'auto',
+  //           from: 'edges',
+  //           ease: 'sine.inOut',
+  //           amount: 0.5
+  //         }
+  //       })
+      
+  //       return () => {
+  //         tl.current.kill()
+  //       };
+  // }, []);
+
+  useIsomorphicLayoutEffect(() => {
     if (!transitionRef.current) {
       return
     }
-      const squares = transitionRef.current.children
-      gsap.set(squares, {
-        autoAlpha: 1
-      })
-      tl.current = gsap.timeline({
-        repeat: 1,
-        repeatDelay: 0.2,
-        yoyo: true,
-        paused: true
-      })
-      .fromTo(squares, 
-        {
-          scale: 0,
-          borderRadius: '100'
-        },
-        {
-          scale: 1,
-          borderRadius: 0,
-          stagger: {
-            grid: 'auto',
-            from: 'edges',
-            ease: 'sine.inOut',
-            amount: 0.5
-          }
+      const ctx = gsap.context((_) => {
+        const squares = transitionRef.current.children
+        gsap.set(squares, {
+          autoAlpha: 1
         })
+        tl.current = gsap.timeline({
+          repeat: 1,
+          repeatDelay: 0.2,
+          yoyo: true,
+          paused: true
+        })
+        .fromTo(squares, 
+          {
+            scale: 0,
+            borderRadius: '100'
+          },
+          {
+            scale: 1,
+            borderRadius: 0,
+            stagger: {
+              grid: 'auto',
+              from: 'edges',
+              ease: 'sine.inOut',
+              amount: 0.5
+            }
+          })
+      })
       
+      
+        // return () => {
+        //   tl.current.kill()
+        // };
         return () => {
-          tl.current.kill()
+          ctx.revert()
         };
   }, []);
 
@@ -137,9 +188,9 @@ const TransitionComponent = ({ children, route, routingPageOffset }) => {
       <CSSTransition
         key={route} 
         classNames='page' 
-        timeout={500}
+        timeout={1000}
         onEnter={playTransition}
-        onExit={stopTransition}
+        onExited={stopTransition}
         // onEnter={(node) => {
         //   toggleCompleted(false);
         //   gsap.set(node, { autoAlpha: 0, scale: 0.8, xPercent: -100 });
@@ -161,6 +212,9 @@ const TransitionComponent = ({ children, route, routingPageOffset }) => {
         // }}
       >
         <MainComponent routingPageOffset={routingPageOffset}>
+          {/* <SecondaryComponent className='page-transition-inner'>
+          {children}
+          </SecondaryComponent> */}
           {children}
         </MainComponent>
         {/* {children} */}

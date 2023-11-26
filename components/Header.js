@@ -22,6 +22,9 @@ export default function Header() {
             <Link href="/">Boxes</Link>
           </li>
           <li>
+            <Link href="/grid">Grid</Link>
+          </li>
+          <li>
             <Link href="/scroll">ScrollTrigger</Link>
           </li>
           <li>

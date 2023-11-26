@@ -13,11 +13,11 @@ const Layout = ({ children }) => {
     const pageChange = () => {
       setRoutingPageOffset(window.scrollY)
     }
-    const pageEnd = () => {
-      setRoutingPageOffset(null)
-    }
+    // const pageEnd = () => {
+    //   setRoutingPageOffset(null)
+    // }
     router.events.on('routeChangeStart', pageChange)
-    router.events.on('routeChangeComplete', pageEnd)
+    // router.events.on('routeChangeComplete', pageEnd)
     console.log(router.events, "router")
   }, [router.events])
   return (
